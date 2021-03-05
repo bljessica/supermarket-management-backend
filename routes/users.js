@@ -1,9 +1,24 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const { User } = require('../db/connect')
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.post('/addUser', function (req, res, next) {
+  let obj = req.body
+  User.create(obj, (err) => {
+    if (err) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: err
+      }))
+      console.log(err)
+    } else {
+      res.send(JSON.stringify({
+        code: 0,
+        msg: '成功添加用户'
+      }))
+    }
+  })
+  
+})
 
-module.exports = router;
+module.exports = router
