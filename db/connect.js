@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 const { ROLE_LIST } = require('../constants/constants')
 
 // 使用原生promise，mongoose自带promise不再支持
@@ -14,9 +15,9 @@ mongoose.connect(url, { useUnifiedTopology: true, useNewUrlParser: true })
 const db = mongoose.connection;
 
 //集合规则
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   account: {
-    type: Number,
+    type: String,
     required: true,
     unique: true
   },
@@ -36,7 +37,7 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   entryTime: { // 入职时间
-    type: Number,
+    type: Date,
     default: Date.now()
   }
 })
