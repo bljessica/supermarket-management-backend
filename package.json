@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
@@ -15,6 +14,7 @@
     "morgan": "~1.9.1"
   },
   "devDependencies": {
+    "eslint": "^7.21.0",
     "nodemon": "^2.0.7"
   }
 }
