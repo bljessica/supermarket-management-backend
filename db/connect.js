@@ -34,7 +34,8 @@ const userSchema = new Schema({
     enum: Object.keys(ROLE_LIST)
   },
   avatar: {
-    type: String
+    type: String,
+    default: ''
   },
   entryTime: { // 入职时间
     type: Date,
@@ -42,4 +43,33 @@ const userSchema = new Schema({
   }
 })
 
+const productSchema = new Schema({
+  productName: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  unit: {
+    type: String,
+    required: true
+  },
+  inventory: {
+    type: Number,
+    required: true
+  },
+  inventoryCeiling: {
+    type: Number,
+    required: true
+  }
+})
+
 exports.User = mongoose.model('User', userSchema)
+exports.Product = mongoose.model('Product', productSchema)

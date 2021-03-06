@@ -3,8 +3,8 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 // require('express-async-errors')
-const usersRouter = require('./routes/user')
 const authRouter = require('./routes/auth')
+const productRouter = require('./routes/product')
 
 const app = express()
 
@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', usersRouter)
 app.use('/', authRouter)
+app.use('/', productRouter)
 
 module.exports = app
