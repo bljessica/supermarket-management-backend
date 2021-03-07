@@ -2,7 +2,7 @@ const express = require('express')
 const { Product } = require('../db/connect')
 const router = express.Router()
 
-router.post('/addProduct', async (req, res, next) => {
+router.post('/addProduct', async (req, res) => {
   let obj = req.body
   const product = await Product.findOne({
     productName: obj.productName
@@ -21,7 +21,7 @@ router.post('/addProduct', async (req, res, next) => {
   }
 })
 
-router.get('/allProducts', async(req, res, next) => {
+router.get('/allProducts', async(req, res) => {
   const data = await Product.find()
   res.send(JSON.stringify({
     code: 0,

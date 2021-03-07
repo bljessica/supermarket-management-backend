@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { User } = require('../db/connect')
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
   let obj = req.body
   const user = await User.findOne({ account: obj.account })
   if (!user) {
@@ -19,7 +19,7 @@ router.post('/register', async (req, res, next) => {
   }
 })
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', async (req, res) => {
   let obj = req.body
   const user = await User.findOne({
     account: obj.account,
@@ -37,7 +37,8 @@ router.post('/login', async (req, res, next) => {
       msg,
       data: {
         username: user.username,
-        avatar: user.avatar || ''
+        avatar: user.avatar || '',
+        role: user.role
       }
     })
   } else {
