@@ -68,6 +68,10 @@ const productSchema = new Schema({
   inventoryCeiling: {
     type: Number,
     required: true
+  },
+  status: {
+    type: String,
+    default: '正常'
   }
 })
 

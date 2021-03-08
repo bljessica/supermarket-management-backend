@@ -13,7 +13,10 @@ router.post('/addProduct', async (req, res) => {
       msg: '该商品已存在'
     }))
   } else {
-    await Product.create(obj)
+    await Product.create({
+      ...obj,
+      status: obj.inventory === 0 ? '售罄' : '正常'
+    })
     res.send(JSON.stringify({
       code: 0,
       msg: '添加成功'
@@ -22,7 +25,8 @@ router.post('/addProduct', async (req, res) => {
 })
 
 router.get('/allProducts', async(req, res) => {
-  const data = await Product.find()
+  let obj = req.query
+  const data = await Product.find(obj)
   res.send(JSON.stringify({
     code: 0,
     msg: null,
@@ -63,7 +67,10 @@ router.put('/editProduct', async(req, res) => {
   let obj = req.body
   await Product.updateOne({
     productName: obj.productName
-  }, obj)
+  }, {
+    ...obj,
+    status: obj.inventory === 0 ? '售罄' : '正常'
+  })
   res.send(JSON.stringify({
     code: 0,
     msg: '修改成功'
