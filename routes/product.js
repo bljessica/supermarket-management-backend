@@ -59,5 +59,15 @@ router.delete('/deleteProducts', async(req, res) => {
   }))
 })
 
+router.put('/editProduct', async(req, res) => {
+  let obj = req.body
+  await Product.updateOne({
+    productName: obj.productName
+  }, obj)
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '修改成功'
+  }))
+})
 
 module.exports = router
