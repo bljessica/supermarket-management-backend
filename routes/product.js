@@ -30,4 +30,15 @@ router.get('/allProducts', async(req, res) => {
   }))
 })
 
+router.delete('/deleteProduct', async(req, res) => {
+  const obj = req.body
+  await Product.deleteOne({
+    productName: obj.productName
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '删除成功'
+  }))
+})
+
 module.exports = router
