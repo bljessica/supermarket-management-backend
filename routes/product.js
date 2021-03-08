@@ -41,4 +41,23 @@ router.delete('/deleteProduct', async(req, res) => {
   }))
 })
 
+router.delete('/deleteProducts', async(req, res) => {
+  const obj = req.body
+  if (!obj.checkedList.length) {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '请先选择商品'
+    }))
+    return
+  }
+  await Product.deleteMany({
+    productName: {'$in': obj.checkedList}
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '删除成功'
+  }))
+})
+
+
 module.exports = router
