@@ -38,8 +38,8 @@ const userSchema = new Schema({
     default: ''
   },
   entryTime: { // 入职时间
-    type: Date,
-    default: Date.now()
+    type: String,
+    required: true
   }
 })
 
@@ -94,8 +94,8 @@ const purchaseSchema = new Schema({
     type: String
   },
   purchaseTime: {
-    type: Date,
-    default: Date.now()
+    type: String,
+    required: true
   },
   purchaseStatus: {
     type: String,
