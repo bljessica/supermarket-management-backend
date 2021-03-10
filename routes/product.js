@@ -42,6 +42,15 @@ router.get('/allProducts', async(req, res) => {
   }))
 })
 
+router.get('/allProductNames', async (req, res) => {
+  const data = await Product.find({}, {productName: 1, _id: 0})
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
 router.delete('/deleteProduct', async(req, res) => {
   const obj = req.body
   await Product.deleteOne({
