@@ -49,7 +49,7 @@ const productSchema = new Schema({
     required: true,
     unique: true
   },
-  description: {
+  image: {
     type: String,
     default: ''
   },
@@ -71,7 +71,7 @@ const productSchema = new Schema({
   },
   status: {
     type: String,
-    default: '正常'
+    default: '售罄'
   }
 })
 

@@ -26,11 +26,19 @@ router.post('/addProduct', async (req, res) => {
 
 router.get('/allProducts', async(req, res) => {
   let obj = req.query
-  const data = await Product.find(obj)
+  const total = await Product.find().count()
+  let filters = {}
+  if (obj.status) {
+    filters = {
+      status: obj.status
+    }
+  }
+  const data = await Product.find(filters).skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).sort({inventory: -1}).limit(10)
   res.send(JSON.stringify({
     code: 0,
     msg: null,
-    data
+    data,
+    total
   }))
 })
 
