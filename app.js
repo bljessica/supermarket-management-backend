@@ -5,6 +5,7 @@ const logger = require('morgan')
 // require('express-async-errors')
 const authRouter = require('./routes/auth')
 const productRouter = require('./routes/product')
+const purchaseRouter = require('./routes/purchase')
 
 const app = express()
 
@@ -31,5 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', authRouter)
 app.use('/', productRouter)
+app.use('/', purchaseRouter)
 
 module.exports = app
