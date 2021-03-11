@@ -22,8 +22,18 @@ router.post('/addPurchaseOrder', async(req, res) => {
 })
 
 router.get('/allPurchaseOrders', async(req, res) => {
-  let obj = req.query
-  const data = await Purchase.find(obj)
+  // let obj = req.query
+  const data = await Purchase.aggregate([
+    {
+      $group: {
+        "_id":"$orderId","orders":{"$push":"$$ROOT"}, //$$ROOT按每个名称保留整个文档
+        count: { $sum: 1 }
+      }
+    }, 
+    {
+      $sort: {_id: -1} // 按订单号排序
+    }
+  ])
   res.send(JSON.stringify({
     code: 0,
     msg: null,
