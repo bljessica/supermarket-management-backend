@@ -107,6 +107,9 @@ const purchaseSchema = new Schema({
 purchaseSchema.index({orderId: 1, productId: 1}, {unique: true})
 
 const productInventoryChangeSchema = new Schema({
+  productId: {
+    type: String
+  },
   type: {
     type: String,
     enum: ['购入', '卖出']
@@ -116,6 +119,9 @@ const productInventoryChangeSchema = new Schema({
   },
   time: {
     type: String
+  },
+  inventory: {
+    type: Number,
   },
   operatorAccount: {
     type: String

@@ -57,9 +57,12 @@ router.put('/changePurchaseOrderStatus', async(req, res) => {
     const records = await Purchase.find({orderId: obj.orderId})
     for(let record of records) {
       const product = await Product.findOne({_id: record.productId})
+      const inventory = parseInt(product.inventory) + parseInt(record.purchaseQuantity)
       await Product.updateOne({_id: record.productId}, 
-      {inventory: parseInt(product.inventory) + parseInt(record.purchaseQuantity), status: '正常'})
+      {inventory, status: '正常'})
       await ProductInventoryChange.create({
+        productId: product._id,
+        inventory,
         type: '购入',
         num: record.purchaseQuantity,
         time: obj.endTime,

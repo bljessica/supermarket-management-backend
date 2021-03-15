@@ -6,6 +6,7 @@ const logger = require('morgan')
 const authRouter = require('./routes/auth')
 const productRouter = require('./routes/product')
 const purchaseRouter = require('./routes/purchase')
+const productInventoryChangeRouter = require('./routes/productInventoryChange')
 
 const app = express()
 
@@ -33,5 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', authRouter)
 app.use('/', productRouter)
 app.use('/', purchaseRouter)
+app.use('/', productInventoryChangeRouter)
 
 module.exports = app
