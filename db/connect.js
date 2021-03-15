@@ -82,7 +82,8 @@ const purchaseSchema = new Schema({
   },
   productName: {
     type: String,
-    required: true
+    required: true,
+    ref: 'Product'
   },
   purchaseQuantity: {
     type: Number

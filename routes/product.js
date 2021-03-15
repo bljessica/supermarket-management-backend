@@ -24,6 +24,16 @@ router.post('/addProduct', async (req, res) => {
   }
 })
 
+router.get('/product', async(req, res) => {
+  let obj = req.query
+  const data = await Product.findOne(obj)
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
 router.get('/allProducts', async(req, res) => {
   let obj = req.query
   const total = await Product.find().count()

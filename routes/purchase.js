@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { Purchase, User } = require('../db/connect')
+const { Purchase, User, Product } = require('../db/connect')
 
 router.post('/addPurchaseOrder', async(req, res) => {
   let obj = req.body
@@ -38,6 +38,23 @@ router.get('/allPurchaseOrders', async(req, res) => {
     code: 0,
     msg: null,
     data
+  }))
+})
+
+router.put('/changePurchaseOrderStatus', async(req, res) => {
+  let obj = req.body
+  await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus})
+  if (obj.purchaseStatus === '已完成') {
+    const records = await Purchase.find({orderId: obj.orderId})
+    records.forEach(async(record) => {
+      const product = await Product.findOne({productName: record.productName})
+      await Product.updateOne({productName: record.productName}, 
+      {inventory: parseInt(product.inventory) + parseInt(record.purchaseQuantity), status: '正常'})
+    })
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null
   }))
 })
 
