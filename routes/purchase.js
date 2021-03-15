@@ -1,18 +1,18 @@
 const express = require('express')
 const router = express.Router()
-const { Purchase, User, Product } = require('../db/connect')
+const { Purchase, Product, User, ProductInventoryChange } = require('../db/connect')
 
 router.post('/addPurchaseOrder', async(req, res) => {
   let obj = req.body
-  const user = await User.findOne({account: obj.purchaserAccount})
   for(let item of obj.items) {
+    const product = await Product.findOne({productName: item.productName})
     await Purchase.create({
       orderId: obj.orderId,
       remark: obj.remark,
       purchaserAccount: obj.purchaserAccount,
-      purchaserName: user.username,
-      purchaseTime: obj.purchaseTime,
-      ...item
+      createTime: obj.createTime,
+      productId: product._id,
+      purchaseQuantity: item.purchaseQuantity
     })
   }
   res.send(JSON.stringify({
@@ -34,6 +34,15 @@ router.get('/allPurchaseOrders', async(req, res) => {
       $sort: {_id: -1} // 按订单号排序
     }
   ])
+  // forEach 不会等待异步任务
+  for(let item of data) {
+    for(let order of item.orders) {
+      const product = await Product.findOne({_id: order.productId})
+      order.productName = product.productName
+      const user = await User.findOne({account: order.purchaserAccount})
+      order.purchaserName = user.username
+    }
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: null,
@@ -43,14 +52,20 @@ router.get('/allPurchaseOrders', async(req, res) => {
 
 router.put('/changePurchaseOrderStatus', async(req, res) => {
   let obj = req.body
-  await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus})
+  await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus, endTime: obj.endTime})
   if (obj.purchaseStatus === '已完成') {
     const records = await Purchase.find({orderId: obj.orderId})
-    records.forEach(async(record) => {
-      const product = await Product.findOne({productName: record.productName})
-      await Product.updateOne({productName: record.productName}, 
+    for(let record of records) {
+      const product = await Product.findOne({_id: record.productId})
+      await Product.updateOne({_id: record.productId}, 
       {inventory: parseInt(product.inventory) + parseInt(record.purchaseQuantity), status: '正常'})
-    })
+      await ProductInventoryChange.create({
+        type: '购入',
+        num: record.purchaseQuantity,
+        time: obj.endTime,
+        operatorAccount: obj.operatorAccount
+      })
+    }
   }
   res.send(JSON.stringify({
     code: 0,

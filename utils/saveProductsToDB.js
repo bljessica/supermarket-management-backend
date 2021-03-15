@@ -4,7 +4,8 @@ const fs = require('fs')
 function saveProducts () {
   const data = fs.readFileSync('data/jd_products.txt', 'utf8')
   console.log('文件读取完成')
-  data.split('\n').forEach(async (line, idx) => {
+  const dataArr = data.split('\n')
+  for(let line of dataArr) {
     const arr = line.split(',')
     const jdIdx = arr[0].indexOf('京东超市')
     await Product.create({
@@ -15,7 +16,7 @@ function saveProducts () {
       inventory: 0,
       inventoryCeiling: 5000
     })
-  })
+  }
 }
 
 saveProducts()

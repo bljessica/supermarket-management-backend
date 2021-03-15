@@ -80,10 +80,8 @@ const purchaseSchema = new Schema({
     type: String,
     required: true
   },
-  productName: {
-    type: String,
-    required: true,
-    ref: 'Product'
+  productId: {
+    type: String
   },
   purchaseQuantity: {
     type: Number
@@ -91,12 +89,11 @@ const purchaseSchema = new Schema({
   purchaserAccount: {
     type: String
   },
-  purchaserName: {
+  createTime: {
     type: String
   },
-  purchaseTime: {
-    type: String,
-    required: true
+  endTime: {
+    type: String
   },
   purchaseStatus: {
     type: String,
@@ -107,8 +104,25 @@ const purchaseSchema = new Schema({
     default: ''
   }
 })
-purchaseSchema.index({orderId: 1, productName: 1}, {unique: true})
+purchaseSchema.index({orderId: 1, productId: 1}, {unique: true})
+
+const productInventoryChangeSchema = new Schema({
+  type: {
+    type: String,
+    enum: ['购入', '卖出']
+  },
+  num: {
+    type: Number,
+  },
+  time: {
+    type: String
+  },
+  operatorAccount: {
+    type: String
+  }
+})
 
 exports.User = mongoose.model('User', userSchema)
 exports.Product = mongoose.model('Product', productSchema)
 exports.Purchase = mongoose.model('Purchase', purchaseSchema)
+exports.ProductInventoryChange = mongoose.model('ProductInventoryChange', productInventoryChangeSchema)
