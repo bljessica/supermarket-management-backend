@@ -83,7 +83,7 @@ router.delete('/deleteProducts', async(req, res) => {
 router.put('/editProduct', async(req, res) => {
   let obj = req.body
   await Product.updateOne({
-    productName: obj.productName
+    _id: obj._id
   }, {
     ...obj,
     status: obj.inventory === 0 ? '售罄' : '正常'
