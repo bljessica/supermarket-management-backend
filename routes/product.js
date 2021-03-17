@@ -26,6 +26,9 @@ router.post('/addProduct', async (req, res) => {
 
 router.get('/product', async(req, res) => {
   let obj = req.query
+  if (obj.productName) {
+    obj.productName = unescape(obj.productName)
+  }
   const data = await Product.findOne(obj)
   res.send(JSON.stringify({
     code: 0,
@@ -54,7 +57,38 @@ router.get('/allProducts', async(req, res) => {
 })
 
 router.get('/allProductNames', async (req, res) => {
-  const data = await Product.find({}, {productName: 1, _id: 0})
+  let obj = req.query
+  let data = null
+  if (obj.inventory) { // 有库存的商品
+    data = await Product.find({inventory: {'$gt': 0}},
+      {productName: 1, _id: 0})
+  } else { // 库存未满且不在某未完成采购订单中的商品
+    data = await Product.aggregate([
+      {
+        $lookup: {
+          from: 'purchases',
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'purchaseOrders'
+        }
+      },
+      {
+        $project: {
+          productName: 1,
+          canPurchase: {$lt: ['$inventory', '$inventoryCeiling']}, // 库存未满
+          _id: 0,
+          purchaseOrders: { // 筛选采购订单状态为未开始
+            $filter: {
+              input: '$purchaseOrders',
+              as: 'order',
+              cond: {$eq: ['$$order.purchaseStatus', '未开始']}
+            }
+          }
+        }
+      },
+      {$match: {'purchaseOrders': [], canPurchase: true}}
+    ])
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: null,

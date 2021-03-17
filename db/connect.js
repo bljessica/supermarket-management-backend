@@ -71,7 +71,8 @@ const productSchema = new Schema({
   },
   status: {
     type: String,
-    default: '售罄'
+    default: '售罄',
+    enum: ['售罄', '正常']
   }
 })
 
@@ -81,7 +82,7 @@ const purchaseSchema = new Schema({
     required: true
   },
   productId: {
-    type: String
+    type: Schema.ObjectId
   },
   purchaseQuantity: {
     type: Number
@@ -97,7 +98,8 @@ const purchaseSchema = new Schema({
   },
   purchaseStatus: {
     type: String,
-    default: '未开始'
+    default: '未开始',
+    enum: ['未开始', '已完成']
   },
   remark: {
     type: String,
