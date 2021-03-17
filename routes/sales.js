@@ -1,0 +1,66 @@
+const express = require('express')
+const router = express.Router()
+const { Sales, Product, ProductInventoryChange, User } = require('../db/connect')
+
+router.post('/addSalesOrder', async(req, res) => {
+  let obj = req.body
+  for(let item of obj.items) {
+    const product = await Product.findOne({productName: item.productName})
+    // 添加销售记录
+    await Sales.create({
+      orderId: obj.orderId,
+      remark: obj.remark,
+      sellerAccount: obj.sellerAccount,
+      createTime: obj.createTime,
+      productId: product._id,
+      salesVolume: item.salesVolume
+    })
+    // 更改商品库存
+    const inventory = parseInt(product.inventory) - parseInt(item.salesVolume)
+      await Product.updateOne({_id: product._id}, 
+      {inventory, status: inventory === 0 ? '售罄' : '正常'})
+      await ProductInventoryChange.create({
+        productId: product._id,
+        inventory,
+        type: '卖出',
+        num: item.salesVolume,
+        time: obj.createTime,
+        operatorAccount: obj.sellerAccount
+      })
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '创建成功'
+  }))
+})
+
+router.get('/allSalesOrders', async(req, res) => {
+  // let obj = req.query
+  const data = await Sales.aggregate([
+    {
+      $group: {
+        "_id":"$orderId","orders":{"$push":"$$ROOT"}, //$$ROOT按每个名称保留整个文档
+        count: { $sum: 1 }
+      }
+    }, 
+    {
+      $sort: {_id: -1} // 按订单号排序
+    }
+  ])
+  // forEach 不会等待异步任务
+  for(let item of data) {
+    for(let order of item.orders) {
+      const product = await Product.findOne({_id: order.productId})
+      order.productName = product.productName
+      const user = await User.findOne({account: order.sellerAccount})
+      order.sellerName = user.username
+    }
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
+module.exports = router

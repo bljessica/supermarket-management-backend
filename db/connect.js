@@ -128,7 +128,31 @@ const productInventoryChangeSchema = new Schema({
   }
 })
 
+const salesSchema = new Schema({
+  orderId: {
+    type: String,
+    required: true
+  },
+  productId: {
+    type: String
+  },
+  salesVolume: {
+    type: Number
+  },
+  sellerAccount: {
+    type: String
+  },
+  createTime: {
+    type: String
+  },
+  remark: {
+    type: String
+  }
+})
+salesSchema.index({orderId: 1, productId: 1}, {unique: true})
+
 exports.User = mongoose.model('User', userSchema)
 exports.Product = mongoose.model('Product', productSchema)
 exports.Purchase = mongoose.model('Purchase', purchaseSchema)
 exports.ProductInventoryChange = mongoose.model('ProductInventoryChange', productInventoryChangeSchema)
+exports.Sales = mongoose.model('Sales', salesSchema)
