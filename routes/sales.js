@@ -65,4 +65,57 @@ router.get('/allSalesOrders', async(req, res) => {
   }))
 })
 
+router.get('/totalSales', async(req, res) => {
+  let obj = req.query
+  const type = obj.type || 'week'
+  let startTime = null
+  let endTime = null
+  if (type === 'week') {
+    startTime = dayjs().startOf(type).add(1, 'day').valueOf()
+    endTime = dayjs().endOf(type).add(1, 'day').valueOf()
+  } else {
+    startTime = dayjs().startOf(type).valueOf()
+    endTime = dayjs().endOf(type).valueOf()
+  }
+  let breaksBetween = null
+  let breakType = 'day'
+  if (type === 'year') {
+    breaksBetween = dayjs(endTime).diff(dayjs(startTime), 'month')
+    breakType = 'month'
+  } else {
+    breaksBetween = dayjs(endTime).diff(dayjs(startTime), 'day')
+  }
+  const data = []
+  for(let i = 0; i <= breaksBetween; i++) {
+    let dayStartTime = dayjs(startTime).add(i, breakType).valueOf()
+    let dayEndTime = dayjs(startTime).add(i + 1, breakType).valueOf()
+    const sales = await Sales.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productId',
+          foreignField: '_id',
+          as: 'product'
+        },
+      },
+      {$unwind: '$product'},
+      {$match: {createTime: {'$gte': dayStartTime, '$lt': dayEndTime}}}
+    ])
+    let total = 0
+    for(let item of sales) {
+      total += item.salesVolume * item.product.price
+    }
+    data.push({
+      total,
+      startTime: dayjs(dayStartTime).format('YYYY/MM/DD HH:mm:ss'),
+      endTime: dayjs(dayEndTime).format('YYYY/MM/DD HH:mm:ss')
+    })
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
 module.exports = router

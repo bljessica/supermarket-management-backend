@@ -136,7 +136,7 @@ const salesSchema = new Schema({
     required: true
   },
   productId: {
-    type: String
+    type: Schema.ObjectId
   },
   salesVolume: {
     type: Number
