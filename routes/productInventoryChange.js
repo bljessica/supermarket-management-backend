@@ -1,6 +1,7 @@
+const dayjs = require('dayjs')
 const express = require('express')
 const router = express.Router()
-const { User, ProductInventoryChange } = require('../db/connect')
+const { ProductInventoryChange } = require('../db/connect')
 
 router.get('/productInventoryChange', async(req, res) => {
   let obj = req.query
@@ -20,6 +21,9 @@ router.get('/productInventoryChange', async(req, res) => {
     {$match: {productId: obj._id}},
     {$sort: {time: -1}}
   ])
+  for(let item of data) {
+    item.time = dayjs(item.time).format('YYYY/MM/DD HH:mm:ss')
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: null,

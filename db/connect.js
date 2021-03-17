@@ -38,7 +38,7 @@ const userSchema = new Schema({
     default: ''
   },
   entryTime: { // 入职时间
-    type: String,
+    type: Number,
     required: true
   }
 })
@@ -91,10 +91,10 @@ const purchaseSchema = new Schema({
     type: String
   },
   createTime: {
-    type: String
+    type: Number
   },
   endTime: {
-    type: String
+    type: Number
   },
   purchaseStatus: {
     type: String,
@@ -120,7 +120,7 @@ const productInventoryChangeSchema = new Schema({
     type: Number,
   },
   time: {
-    type: String
+    type: Number
   },
   inventory: {
     type: Number,
@@ -145,7 +145,7 @@ const salesSchema = new Schema({
     type: String
   },
   createTime: {
-    type: String
+    type: Number
   },
   remark: {
     type: String

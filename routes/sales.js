@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { Sales, Product, ProductInventoryChange, User } = require('../db/connect')
+const dayjs = require('dayjs')
 
 router.post('/addSalesOrder', async(req, res) => {
   let obj = req.body
@@ -54,6 +55,7 @@ router.get('/allSalesOrders', async(req, res) => {
       order.productName = product.productName
       const user = await User.findOne({account: order.sellerAccount})
       order.sellerName = user.username
+      order.createTime = dayjs(order.createTime).format('YYYY/MM/DD HH:mm:ss')
     }
   }
   res.send(JSON.stringify({
