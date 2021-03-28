@@ -118,4 +118,45 @@ router.get('/totalSales', async(req, res) => {
   }))
 })
 
+router.get('/salesReport', async(req, res) => {
+  const obj = req.query
+  const type = obj.type || 'week'
+  let startTime = null
+  let endTime = null
+  if (type === 'week') {
+    startTime = dayjs().startOf(type).add(-6, 'day').valueOf()
+    endTime = dayjs().endOf(type).add(-6, 'day').valueOf()
+  } else {
+    startTime = dayjs().startOf(type).valueOf()
+    endTime = dayjs().endOf(type).valueOf()
+  }
+  const data = await Sales.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'product'
+      }
+    },
+    {$unwind: '$product'},
+    {$match: {createTime: {$gte: startTime, $lt: endTime}}},
+    {$group: {
+      _id: '$product.productName',
+      price: {$first: '$product.price'},
+      num: {$sum: '$salesVolume'},
+    }},
+    {$project: {
+      price: 1,
+      num: 1,
+      amount: {'$multiply': ['$price', '$num']}
+    }}
+  ])
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
 module.exports = router
