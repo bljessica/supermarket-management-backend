@@ -153,8 +153,31 @@ const salesSchema = new Schema({
 })
 salesSchema.index({orderId: 1, productId: 1}, {unique: true})
 
+const chatSchema = new Schema({
+  senderAccount: {
+    type: String
+  },
+  senderAvatar: {
+    type: String
+  },
+  recipientAccount: {
+    type: String
+  },
+  recipientAvatar: {
+    type: String
+  },
+  content: {
+    type: String,
+    default: ''
+  },
+  time: {
+    type: Number
+  }
+})
+
 exports.User = mongoose.model('User', userSchema)
 exports.Product = mongoose.model('Product', productSchema)
 exports.Purchase = mongoose.model('Purchase', purchaseSchema)
 exports.ProductInventoryChange = mongoose.model('ProductInventoryChange', productInventoryChangeSchema)
 exports.Sales = mongoose.model('Sales', salesSchema)
+exports.Chat = mongoose.model('Chat', chatSchema)
