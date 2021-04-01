@@ -13,14 +13,30 @@ router.post('/sendMsg', async(req, res) => {
 
 router.get('/chatHistory', async(req, res) => {
   const obj = req.query
-  const dataSend = await Chat.find({
-    senderAccount: obj.senderAccount,
-    recipientAccount: obj.recipientAccount
-  })
-  const dataReceive = await Chat.find({
-    senderAccount: obj.recipientAccount,
-    recipientAccount: obj.senderAccount
-  })
+  const dataSend = await Chat.aggregate([
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'senderAccount',
+        foreignField: 'account',
+        as: 'user'
+      },
+    },
+    {$unwind: '$user'},
+    {$match: {senderAccount: obj.senderAccount, recipientAccount: obj.recipientAccount}}
+  ])
+  const dataReceive = await Chat.aggregate([
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'senderAccount',
+        foreignField: 'account',
+        as: 'user'
+      },
+    },
+    {$unwind: '$user'},
+    {$match: {senderAccount: obj.recipientAccount, recipientAccount: obj.senderAccount}}
+  ])
   res.send(JSON.stringify({
     code: 0,
     msg: null,

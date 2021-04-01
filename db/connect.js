@@ -157,13 +157,7 @@ const chatSchema = new Schema({
   senderAccount: {
     type: String
   },
-  senderAvatar: {
-    type: String
-  },
   recipientAccount: {
-    type: String
-  },
-  recipientAvatar: {
     type: String
   },
   content: {

@@ -10,11 +10,14 @@ const getSocketIo = function(server){
     const socketId = socket.id
     // 用户登录
     socket.on('userLogin', (account) => {
-      if (users.findIndex(user => (user.account === account)) === -1) {
+      const user = users.find(user => (user.account === account))
+      if (!user) {
         users.push({
           account,
           socketId
         })
+      } else {
+        user.socketId = socketId
       }
       console.log('userLogin', users)
     })
@@ -24,6 +27,10 @@ const getSocketIo = function(server){
       if (receiverSocketId) {
         io.sockets.to(receiverSocketId).emit('newMsg')
       }
+    })
+    // 用户信息更新
+    socket.on('userUpdate', () => {
+      socket.broadcast.emit('someUserUpdate')
     })
   })
 }
