@@ -12,7 +12,8 @@
     "express": "~4.16.1",
     "express-async-errors": "^3.1.1",
     "mongoose": "^5.11.18",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "socket.io": "^4.0.1"
   },
   "devDependencies": {
     "eslint": "^7.21.0",
