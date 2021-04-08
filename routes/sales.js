@@ -71,8 +71,8 @@ router.get('/totalSales', async(req, res) => {
   let startTime = null
   let endTime = null
   if (type === 'week') {
-    startTime = dayjs().startOf(type).add(-6, 'day').valueOf()
-    endTime = dayjs().endOf(type).add(-6, 'day').valueOf()
+    startTime = dayjs().startOf(type).add(1, 'day').valueOf()
+    endTime = dayjs().endOf(type).add(1, 'day').valueOf()
   } else {
     startTime = dayjs().startOf(type).valueOf()
     endTime = dayjs().endOf(type).valueOf()
@@ -124,8 +124,8 @@ router.get('/salesReport', async(req, res) => {
   let startTime = null
   let endTime = null
   if (type === 'week') {
-    startTime = dayjs().startOf(type).add(-6, 'day').valueOf()
-    endTime = dayjs().endOf(type).add(-6, 'day').valueOf()
+    startTime = dayjs().startOf(type).add(1, 'day').valueOf()
+    endTime = dayjs().endOf(type).add(1, 'day').valueOf()
   } else {
     startTime = dayjs().startOf(type).valueOf()
     endTime = dayjs().endOf(type).valueOf()

@@ -1,5 +1,6 @@
 const express = require('express')
-const { Product } = require('../db/connect')
+const { Product, Purchase, Sales, ProductInventoryChange } = require('../db/connect')
+const mongoose = require('mongoose')
 const router = express.Router()
 
 router.post('/addProduct', async (req, res) => {
@@ -101,6 +102,10 @@ router.delete('/deleteProduct', async(req, res) => {
   await Product.deleteOne({
     productName: obj.productName
   })
+  // 相关表删除记录
+  await Purchase.deleteMany({productId: mongoose.Types.ObjectId(obj._id)})
+  await Sales.deleteMany({productId: mongoose.Types.ObjectId(obj._id)})
+  await ProductInventoryChange.deleteMany({productId: obj._id})
   res.send(JSON.stringify({
     code: 0,
     msg: '删除成功'
@@ -117,8 +122,13 @@ router.delete('/deleteProducts', async(req, res) => {
     return
   }
   await Product.deleteMany({
-    productName: {'$in': obj.checkedList}
+    productName: {'$in': obj.checkedList.map(item => item.productName)}
   })
+  // 相关表删除记录
+  const _ids = obj.checkedList.map(item => mongoose.Types.ObjectId(item._id))
+  await Purchase.deleteMany({productId: {$in: _ids}})
+  await Sales.deleteMany({productId: {$in: _ids}})
+  await ProductInventoryChange.deleteMany({productId: {$in: obj.checkedList.map(item => (item._id))}})
   res.send(JSON.stringify({
     code: 0,
     msg: '删除成功'
@@ -127,6 +137,15 @@ router.delete('/deleteProducts', async(req, res) => {
 
 router.put('/editProduct', async(req, res) => {
   let obj = req.body
+  // 判断是否重名
+  const product = await Product.findOne({productName: obj.productName})
+  if (product) {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '存在同名商品'
+    }))
+    return
+  }
   await Product.updateOne({
     _id: obj._id
   }, {
