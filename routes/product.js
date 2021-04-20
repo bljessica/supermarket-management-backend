@@ -2,6 +2,7 @@ const express = require('express')
 const { Product, Purchase, Sales, ProductInventoryChange } = require('../db/connect')
 const mongoose = require('mongoose')
 const router = express.Router()
+const dayjs = require('dayjs')
 
 router.post('/addProduct', async (req, res) => {
   let obj = req.body
@@ -155,6 +156,42 @@ router.put('/editProduct', async(req, res) => {
   res.send(JSON.stringify({
     code: 0,
     msg: '修改成功'
+  }))
+})
+
+router.get('/productSuggest', async(req, res) => {
+  const startTime = dayjs().startOf('month').valueOf()
+  const endTime = dayjs().endOf('month').valueOf()
+  const data = await Sales.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'product'
+      },
+    },
+    {$unwind: '$product'},
+    {$match: {createTime: {'$gte': startTime, '$lt': endTime}}},
+    {$group: {
+      _id: '$product.productName',
+      id: {$first: '$product._id'},
+      price: {$first: '$product.price'},
+      num: {$sum: '$salesVolume'},
+      image: {$first: '$product.image'}
+    }},
+    {$project: {
+      price: 1,
+      image: 1,
+      id: 1,
+      num: 1, // 总销量
+      amount: {'$multiply': ['$price', '$num']} // 总销售额
+    }}
+  ])
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
   }))
 })
 
