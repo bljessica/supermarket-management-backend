@@ -23,7 +23,6 @@ router.post('/addPurchaseOrder', async(req, res) => {
 })
 
 router.get('/allPurchaseOrders', async(req, res) => {
-  // let obj = req.query
   const data = await Purchase.aggregate([
     {
       $group: {

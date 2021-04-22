@@ -1,7 +1,7 @@
 const { Product } = require('../db/connect')
 const fs = require('fs')
 
-function saveProducts () {
+async function saveProducts () {
   const data = fs.readFileSync('data/jd_products.txt', 'utf8')
   console.log('文件读取完成')
   const dataArr = data.split('\n')
@@ -11,6 +11,7 @@ function saveProducts () {
     await Product.create({
       productName: jdIdx === -1 ? arr[0] : (arr[0].substring(0, jdIdx) + arr[0].substring(jdIdx + 5)),
       price: arr[1],
+      purchasePrice: (0.9 * parseFloat(arr[1])).toFixed(1),
       image: arr[5],
       unit: '份',
       inventory: 0,

@@ -49,7 +49,7 @@ router.get('/allProducts', async(req, res) => {
   }
   const total = await Product.find({...filters, productName: new RegExp(obj.searchText || '', 'i')}).count()
   const data = await Product.find({...filters, productName: new RegExp(obj.searchText || '', 'i')})
-    .skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).sort({inventory: -1}).limit(10)
+    .skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).sort({inventory: -1, _id: -1}).limit(10)
   res.send(JSON.stringify({
     code: 0,
     msg: null,
@@ -63,9 +63,10 @@ router.get('/allProductNames', async (req, res) => {
   let data = null
   if (obj.inventory) { // 有库存的商品
     data = await Product.find({inventory: {'$gt': 0}},
-      {productName: 1, _id: 0})
+      {productName: 1, _id: 0}).sort({_id: -1})
   } else { // 库存未满且不在某未完成采购订单中的商品
     data = await Product.aggregate([
+      {$sort: {_id: -1}},
       {
         $lookup: {
           from: 'purchases',
@@ -185,8 +186,10 @@ router.get('/productSuggest', async(req, res) => {
       image: 1,
       id: 1,
       num: 1, // 总销量
-      amount: {'$multiply': ['$price', '$num']} // 总销售额
-    }}
+      amount: {$multiply: ['$price', '$num']}, // 总销售额
+      profit: {$multiply: [{$subtract: ['$price', '$purchasePrice']}, '$num']}
+    }},
+    {$limit: 20}
   ])
   res.send(JSON.stringify({
     code: 0,

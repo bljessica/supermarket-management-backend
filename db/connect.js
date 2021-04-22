@@ -53,7 +53,11 @@ const productSchema = new Schema({
     type: String,
     default: ''
   },
-  price: {
+  price: { // 售价
+    type: Number,
+    required: true
+  },
+  purchasePrice: { // 进价
     type: Number,
     required: true
   },

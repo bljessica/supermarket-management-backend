@@ -102,11 +102,14 @@ router.get('/totalSales', async(req, res) => {
       {$match: {createTime: {'$gte': dayStartTime, '$lt': dayEndTime}}}
     ])
     let total = 0
+    let totalCost = 0
     for(let item of sales) {
       total += item.salesVolume * item.product.price
+      totalCost += item.salesVolume * item.product.purchasePrice
     }
     data.push({
-      total,
+      totalSales: total.toFixed(1),
+      totalProfit: (total - totalCost).toFixed(1),
       startTime: dayjs(dayStartTime).format('YYYY/MM/DD HH:mm:ss'),
       endTime: dayjs(dayEndTime).format('YYYY/MM/DD HH:mm:ss')
     })
@@ -144,14 +147,20 @@ router.get('/salesReport', async(req, res) => {
     {$group: {
       _id: '$product.productName',
       price: {$first: '$product.price'},
+      purchasePrice: {$first: '$product.purchasePrice'},
       num: {$sum: '$salesVolume'},
     }},
     {$project: {
       price: 1,
       num: 1,
-      amount: {'$multiply': ['$price', '$num']}
+      amount: {$multiply: ['$price', '$num']},
+      profit: {$multiply: [{$subtract: ['$price', '$purchasePrice']}, '$num']}
     }}
   ])
+  data.forEach(item => {
+    item.amount = item.amount.toFixed(1)
+    item.profit = item.profit.toFixed(1)
+  })
   res.send(JSON.stringify({
     code: 0,
     msg: null,
