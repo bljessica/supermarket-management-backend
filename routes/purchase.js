@@ -65,6 +65,7 @@ router.get('/allPurchaseOrders', async(req, res) => {
       order.productName = product.productName
       const user = await User.findOne({account: order.purchaserAccount})
       order.purchaserName = user.username
+      order.purchaserAccount = user.account
       order.createTime = dayjs(order.createTime).format('YYYY/MM/DD HH:mm:ss')
       order.endTime = order.endTime ? dayjs(order.endTime).format('YYYY/MM/DD HH:mm:ss') : ''
     }
