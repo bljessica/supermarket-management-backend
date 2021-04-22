@@ -147,15 +147,18 @@ router.get('/salesReport', async(req, res) => {
     {$group: {
       _id: '$product.productName',
       price: {$first: '$product.price'},
+      unit: {$first: '$product.unit'},
       purchasePrice: {$first: '$product.purchasePrice'},
-      num: {$sum: '$salesVolume'},
+      num: {$sum: '$salesVolume'}
     }},
     {$project: {
       price: 1,
       num: 1,
+      unit: 1,
       amount: {$multiply: ['$price', '$num']},
       profit: {$multiply: [{$subtract: ['$price', '$purchasePrice']}, '$num']}
-    }}
+    }},
+    {$sort: {profit: -1}}
   ])
   data.forEach(item => {
     item.amount = item.amount.toFixed(1)
