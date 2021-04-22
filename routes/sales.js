@@ -35,6 +35,30 @@ router.post('/addSalesOrder', async(req, res) => {
   }))
 })
 
+router.delete('/salesOrder', async(req, res) => {
+  const obj = req.body
+  const salesRecords = await Sales.find({orderId: obj.orderId})
+  await Sales.deleteMany({orderId: obj.orderId})
+  // 还原商品库存
+  for(let item of salesRecords) {
+    const product = await Product.findOne({_id: item.productId})
+    const total = parseInt(product.inventory) + parseInt(item.salesVolume)
+    const inventory = total > product.inventoryCeiling ? product.inventoryCeiling : total
+      await Product.updateOne({_id: item.productId}, 
+      {inventory, status: '正常'})
+      await ProductInventoryChange.deleteMany({
+        productId: item.productId,
+        type: '卖出',
+        time: item.createTime,
+        operatorAccount: item.sellerAccount
+      })
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '删除成功'
+  }))
+})
+
 router.get('/allSalesOrders', async(req, res) => {
   // let obj = req.query
   const data = await Sales.aggregate([
