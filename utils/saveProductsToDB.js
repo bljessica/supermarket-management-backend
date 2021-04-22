@@ -8,15 +8,19 @@ async function saveProducts () {
   for(let line of dataArr) {
     const arr = line.split(',')
     const jdIdx = arr[0].indexOf('京东超市')
-    await Product.create({
-      productName: jdIdx === -1 ? arr[0] : (arr[0].substring(0, jdIdx) + arr[0].substring(jdIdx + 5)),
-      price: arr[1],
-      purchasePrice: (0.9 * parseFloat(arr[1])).toFixed(1),
-      image: arr[5],
-      unit: '份',
-      inventory: 0,
-      inventoryCeiling: 5000
-    })
+    const name = jdIdx === -1 ? arr[0] : (arr[0].substring(0, jdIdx) + arr[0].substring(jdIdx + 5))
+    const product = await Product.findOne({productName: name})
+    if (!product && !isNaN(parseFloat(arr[1]))) {
+      await Product.create({
+        productName: name,
+        price: arr[1],
+        purchasePrice: (0.9 * parseFloat(arr[1])).toFixed(1),
+        image: arr[5],
+        unit: '份',
+        inventory: 0,
+        inventoryCeiling: 5000
+      })
+    }
   }
 }
 
