@@ -4,7 +4,7 @@ const router = express.Router()
 const { ProductInventoryChange } = require('../db/connect')
 
 router.get('/productInventoryChange', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   // 联表查询
   const data = await ProductInventoryChange.aggregate([
     {

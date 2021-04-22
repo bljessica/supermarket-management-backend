@@ -5,7 +5,7 @@ const router = express.Router()
 const dayjs = require('dayjs')
 
 router.post('/addProduct', async (req, res) => {
-  let obj = req.body
+  const obj = req.body
   const product = await Product.findOne({
     productName: obj.productName
   })
@@ -27,7 +27,7 @@ router.post('/addProduct', async (req, res) => {
 })
 
 router.get('/product', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   if (obj.productName) {
     obj.productName = unescape(obj.productName)
   }
@@ -40,7 +40,7 @@ router.get('/product', async(req, res) => {
 })
 
 router.get('/allProducts', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   let filters = {}
   if (obj.status) {
     filters = {
@@ -59,7 +59,7 @@ router.get('/allProducts', async(req, res) => {
 })
 
 router.get('/allProductNames', async (req, res) => {
-  let obj = req.query
+  const obj = req.query
   let data = null
   if (obj.inventory) { // 有库存的商品
     data = await Product.find({inventory: {'$gt': 0}},
@@ -138,7 +138,7 @@ router.delete('/deleteProducts', async(req, res) => {
 })
 
 router.put('/editProduct', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   // 判断是否重名
   const product = await Product.findOne({productName: obj.productName})
   if (product) {

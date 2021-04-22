@@ -4,7 +4,7 @@ const { Sales, Product, ProductInventoryChange, User } = require('../db/connect'
 const dayjs = require('dayjs')
 
 router.post('/addSalesOrder', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   for(let item of obj.items) {
     const product = await Product.findOne({productName: item.productName})
     // 添加销售记录
@@ -44,8 +44,7 @@ router.delete('/salesOrder', async(req, res) => {
     const product = await Product.findOne({_id: item.productId})
     const total = parseInt(product.inventory) + parseInt(item.salesVolume)
     const inventory = total > product.inventoryCeiling ? product.inventoryCeiling : total
-      await Product.updateOne({_id: item.productId}, 
-      {inventory, status: '正常'})
+      await Product.updateOne({_id: item.productId}, {inventory, status: '正常'})
       await ProductInventoryChange.deleteMany({
         productId: item.productId,
         type: '卖出',
@@ -60,7 +59,7 @@ router.delete('/salesOrder', async(req, res) => {
 })
 
 router.get('/allSalesOrders', async(req, res) => {
-  // let obj = req.query
+  // const obj = req.query
   const data = await Sales.aggregate([
     {
       $group: {
@@ -90,7 +89,7 @@ router.get('/allSalesOrders', async(req, res) => {
 })
 
 router.get('/totalSales', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   const type = obj.type || 'week'
   let startTime = null
   let endTime = null

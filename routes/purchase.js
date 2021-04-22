@@ -4,7 +4,7 @@ const { Purchase, Product, User, ProductInventoryChange } = require('../db/conne
 const dayjs = require('dayjs')
 
 router.post('/addPurchaseOrder', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   for(let item of obj.items) {
     const product = await Product.findOne({productName: item.productName})
     await Purchase.create({
@@ -19,6 +19,30 @@ router.post('/addPurchaseOrder', async(req, res) => {
   res.send(JSON.stringify({
     code: 0,
     msg: '创建成功'
+  }))
+})
+
+router.delete('/purchaseOrder', async(req, res) => {
+  const obj = req.body
+  const purchaseOrders = await Purchase.find({orderId: obj.orderId})
+  if (purchaseOrders[0].purchaseStatus === '已完成') {
+    for(let item of purchaseOrders) {
+      const product = await Product.findOne({_id: item.productId})
+      const total = parseInt(product.inventory) - parseInt(item.purchaseQuantity)
+      const inventory = total > 0 ? total : 0
+      await Product.updateOne({_id: item.productId}, {inventory, status: inventory === 0 ? '售罄' : '正常'})
+      await ProductInventoryChange.deleteMany({
+        productId: item.productId,
+        type: '购入',
+        time: item.endTime,
+        operatorAccount: item.purchaserAccount
+      })
+    }
+  } 
+  await Purchase.deleteMany({orderId: obj.orderId})
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '删除成功'
   }))
 })
 
@@ -53,7 +77,7 @@ router.get('/allPurchaseOrders', async(req, res) => {
 })
 
 router.put('/changePurchaseOrderStatus', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus, endTime: obj.endTime})
   if (obj.purchaseStatus === '已完成') {
     const records = await Purchase.find({orderId: obj.orderId})

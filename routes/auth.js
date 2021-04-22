@@ -3,7 +3,7 @@ const router = express.Router()
 const { User } = require('../db/connect')
 
 router.post('/register', async (req, res) => {
-  let obj = req.body
+  const obj = req.body
   const user = await User.findOne({ account: obj.account })
   if (!user) {
     await User.create(obj)
@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  let obj = req.body
+  const obj = req.body
   const user = await User.findOne({
     account: obj.account,
     password: obj.password
