@@ -24,4 +24,10 @@ async function saveProducts () {
   }
 }
 
-saveProducts()
+(async function (){
+  console.log('开始存储商品数据...')
+  await saveProducts()
+  console.log('商品数据存储完毕')
+  process.exit()
+})()
+
