@@ -72,17 +72,13 @@ router.get('/purchaseOrder', async(req, res) => {
     {$unwind: '$user'}
   ])
   const data = {
-    name: {
-      label: '订单名',
-      value: records[0].name
-    },
     orderId: {
       label: '订单ID',
       value: records[0].orderId
     },
-    inventoryLocation: {
-      label: '库存地点',
-      value: records[0].inventoryLocation
+    name: {
+      label: '订单名',
+      value: records[0].name
     },
     purchaserAccount: {
       label: '采购员账号',
@@ -91,6 +87,10 @@ router.get('/purchaseOrder', async(req, res) => {
     purchaserName: {
       label: '采购员昵称',
       value: records[0].user.username
+    },
+    inventoryLocation: {
+      label: '库存地点',
+      value: records[0].inventoryLocation
     },
     purchaseStatus: {
       label: '采购状态',
