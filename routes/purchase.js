@@ -8,8 +8,10 @@ router.post('/addPurchaseOrder', async(req, res) => {
   for(let item of obj.items) {
     const product = await Product.findOne({productName: item.productName})
     await Purchase.create({
+      name: obj.name,
       orderId: obj.orderId,
       remark: obj.remark,
+      inventoryLocation: obj.inventoryLocation,
       purchaserAccount: obj.purchaserAccount,
       createTime: obj.createTime,
       productId: product._id,
@@ -25,7 +27,7 @@ router.post('/addPurchaseOrder', async(req, res) => {
 router.delete('/purchaseOrder', async(req, res) => {
   const obj = req.body
   const purchaseOrders = await Purchase.find({orderId: obj.orderId})
-  if (purchaseOrders[0].purchaseStatus === '已完成') {
+  if (purchaseOrders[0].purchaseStatus === '订单完成') {
     for(let item of purchaseOrders) {
       const product = await Product.findOne({_id: item.productId})
       const total = parseInt(product.inventory) - parseInt(item.purchaseQuantity)
@@ -46,6 +48,86 @@ router.delete('/purchaseOrder', async(req, res) => {
   }))
 })
 
+router.get('/purchaseOrder', async(req, res) => {
+  const obj = req.query
+  const records = await Purchase.aggregate([
+    {$match: {orderId: obj.orderId}},
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'product'
+      },
+    },
+    {$unwind: '$product'},
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'purchaserAccount',
+        foreignField: 'account',
+        as: 'user'
+      },
+    },
+    {$unwind: '$user'}
+  ])
+  const data = {
+    name: {
+      label: '订单名',
+      value: records[0].name
+    },
+    orderId: {
+      label: '订单ID',
+      value: records[0].orderId
+    },
+    inventoryLocation: {
+      label: '库存地点',
+      value: records[0].inventoryLocation
+    },
+    purchaserAccount: {
+      label: '采购员账号',
+      value: records[0].purchaserAccount
+    },
+    purchaserName: {
+      label: '采购员昵称',
+      value: records[0].user.username
+    },
+    purchaseStatus: {
+      label: '采购状态',
+      value: records[0].purchaseStatus
+    },
+    createTime: {
+      label: '创建时间',
+      value: dayjs(records[0].createTime).format('YYYY/MM/DD HH:mm:ss')
+    }
+  }
+  if (records[0].endTime) {
+    data.endTime = {
+      label: '完成时间',
+      value: dayjs(records[0].endTime).format('YYYY/MM/DD HH:mm:ss')
+    }
+  }
+  data.items = {
+    label: '采购商品',
+    value: records.map(record => {
+      return {
+        _id: record.product._id,
+        productName: record.product.productName,
+        purchaseQuantity: record.purchaseQuantity
+      }
+    })
+  }
+  data.remark = {
+    label: '备注',
+    value: records[0].remark
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
 router.get('/allPurchaseOrders', async(req, res) => {
   const data = await Purchase.aggregate([
     {
@@ -56,7 +138,10 @@ router.get('/allPurchaseOrders', async(req, res) => {
     }, 
     {
       $sort: {_id: -1} // 按订单号排序
-    }
+    },
+    // {
+    //   $limit: 3
+    // }
   ])
   // forEach 不会等待异步任务
   for(let item of data) {
@@ -79,8 +164,8 @@ router.get('/allPurchaseOrders', async(req, res) => {
 
 router.put('/changePurchaseOrderStatus', async(req, res) => {
   const obj = req.body
-  await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus, endTime: obj.endTime})
-  if (obj.purchaseStatus === '已完成') {
+  if (obj.purchaseStatus === '订单完成' || obj.purchaseStatus === '入库完成') {
+    await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: '订单完成', endTime: obj.endTime})
     const records = await Purchase.find({orderId: obj.orderId})
     for(let record of records) {
       const product = await Product.findOne({_id: record.productId})
@@ -96,10 +181,12 @@ router.put('/changePurchaseOrderStatus', async(req, res) => {
         operatorAccount: obj.operatorAccount
       })
     }
+  } else {
+    await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: obj.purchaseStatus})
   }
   res.send(JSON.stringify({
     code: 0,
-    msg: null
+    msg: '变更成功'
   }))
 })
 

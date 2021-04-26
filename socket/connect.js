@@ -6,7 +6,7 @@ let io = null
 const getSocketIo = function(server){  
   io = require('socket.io')(server, {cors: true}) 
   io.on('connection', (socket) => {
-    console.log('connected')
+    console.log('socket connected')
     const socketId = socket.id
     // 用户登录
     socket.on('userLogin', (account) => {

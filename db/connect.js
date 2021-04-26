@@ -85,6 +85,10 @@ const purchaseSchema = new Schema({
     type: String,
     required: true
   },
+  name: {
+    type: String,
+    required: true
+  },
   productId: {
     type: Schema.ObjectId
   },
@@ -103,7 +107,11 @@ const purchaseSchema = new Schema({
   purchaseStatus: {
     type: String,
     default: '未开始',
-    enum: ['未开始', '已完成']
+    enum: ['未开始', '采购完成', '订单完成']
+  },
+  inventoryLocation: {
+    type: String,
+    default: '默认仓库'
   },
   remark: {
     type: String,
