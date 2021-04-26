@@ -129,6 +129,14 @@ router.get('/purchaseOrder', async(req, res) => {
 })
 
 router.get('/allPurchaseOrders', async(req, res) => {
+  const obj = req.query
+  const total = (await Purchase.aggregate([
+    {
+      $group: {
+        "_id":"$orderId" //$$ROOT按每个名称保留整个文档
+      }
+    }
+  ])).length
   const data = await Purchase.aggregate([
     {
       $group: {
@@ -139,9 +147,12 @@ router.get('/allPurchaseOrders', async(req, res) => {
     {
       $sort: {_id: -1} // 按订单号排序
     },
-    // {
-    //   $limit: 3
-    // }
+    {
+      $skip: (obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)
+    },
+    {
+      $limit: parseInt(obj.pageSize)
+    }
   ])
   // forEach 不会等待异步任务
   for(let item of data) {
@@ -158,7 +169,8 @@ router.get('/allPurchaseOrders', async(req, res) => {
   res.send(JSON.stringify({
     code: 0,
     msg: null,
-    data
+    data,
+    total
   }))
 })
 
