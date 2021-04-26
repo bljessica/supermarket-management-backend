@@ -3,7 +3,6 @@ const fs = require('fs')
 
 async function saveProducts () {
   const data = fs.readFileSync('data/jd_products.txt', 'utf8')
-  console.log('文件读取完成')
   const dataArr = data.split('\n')
   for(let line of dataArr) {
     const arr = line.split(',')
