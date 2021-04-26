@@ -26,7 +26,8 @@ router.post('/addSalesOrder', async(req, res) => {
         type: '卖出',
         num: item.salesVolume,
         time: obj.createTime,
-        operatorAccount: obj.sellerAccount
+        operatorAccount: obj.sellerAccount,
+        remark: obj.remark
       })
   }
   res.send(JSON.stringify({

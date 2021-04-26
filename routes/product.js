@@ -49,7 +49,7 @@ router.get('/allProducts', async(req, res) => {
   }
   const total = await Product.find({...filters, productName: new RegExp(obj.searchText || '', 'i')}).count()
   const data = await Product.find({...filters, productName: new RegExp(obj.searchText || '', 'i')})
-    .skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).sort({inventory: -1, _id: -1}).limit(10)
+    .skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).sort({inventory: -1, _id: -1}).limit(parseInt(obj.pageSize))
   res.send(JSON.stringify({
     code: 0,
     msg: null,

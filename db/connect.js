@@ -139,6 +139,10 @@ const productInventoryChangeSchema = new Schema({
   },
   operatorAccount: {
     type: String
+  },
+  remark: {
+    type: String,
+    default: ''
   }
 })
 

@@ -166,6 +166,7 @@ router.put('/changePurchaseOrderStatus', async(req, res) => {
   const obj = req.body
   if (obj.purchaseStatus === '订单完成' || obj.purchaseStatus === '入库完成') {
     await Purchase.updateMany({orderId: obj.orderId}, {purchaseStatus: '订单完成', endTime: obj.endTime})
+    const purchase = await Purchase.findOne({orderId: obj.orderId})
     const records = await Purchase.find({orderId: obj.orderId})
     for(let record of records) {
       const product = await Product.findOne({_id: record.productId})
@@ -178,7 +179,8 @@ router.put('/changePurchaseOrderStatus', async(req, res) => {
         type: '购入',
         num: record.purchaseQuantity,
         time: obj.endTime,
-        operatorAccount: obj.operatorAccount
+        operatorAccount: obj.operatorAccount,
+        remark: purchase.remark
       })
     }
   } else {
