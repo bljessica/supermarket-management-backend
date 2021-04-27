@@ -9,7 +9,7 @@ router.post('/register', async (req, res) => {
     await User.create(obj)
     res.send(JSON.stringify({
       code: 0,
-      msg: '注册成功'
+      msg: '添加成功'
     }))
   } else {
     res.send(JSON.stringify({

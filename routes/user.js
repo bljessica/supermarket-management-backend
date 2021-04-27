@@ -25,7 +25,8 @@ router.put('/userInfo', async(req, res) => {
   const obj = req.body
   await User.updateOne({account: obj.account}, {
     avatar: obj.avatar,
-    username: obj.username
+    username: obj.username,
+    role: obj.role
   })
   res.send(JSON.stringify({
     code: 0,
