@@ -10,6 +10,7 @@ const productInventoryChangeRouter = require('./routes/productInventoryChange')
 const salesRouter = require('./routes/sales')
 const userRouter = require('./routes/user')
 const chatRouter = require('./routes/chat')
+const userRoleChangeRouter = require('./routes/userRoleChange')
 
 const app = express()
 
@@ -41,5 +42,6 @@ app.use('/', productInventoryChangeRouter)
 app.use('/', salesRouter)
 app.use('/', userRouter)
 app.use('/', chatRouter)
+app.use('/', userRoleChangeRouter)
 
 module.exports = app

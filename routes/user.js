@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { User } = require('../db/connect')
+const { User, UserRoleChange } = require('../db/connect')
 const dayjs = require('dayjs')
 const { ROLE_LIST } = require('../constants/constants')
 
@@ -23,11 +23,21 @@ router.get('/userInfo', async(req, res) => {
 
 router.put('/userInfo', async(req, res) => {
   const obj = req.body
+  const user = await User.findOne({account: obj.account})
   await User.updateOne({account: obj.account}, {
     avatar: obj.avatar,
     username: obj.username,
     role: obj.role
   })
+  if (user.role !== obj.role) {
+    await UserRoleChange.create({
+      operatorAccount: obj.operatorAccount,
+      operatedAccount: obj.account,
+      time: Date.now(),
+      roleBefore: user.role,
+      roleAfter: obj.role
+    })
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: '更新成功'

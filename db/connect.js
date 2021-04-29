@@ -184,10 +184,44 @@ const chatSchema = new Schema({
     type: Number
   }
 })
+const userRoleChangeSchema = new Schema({
+  operatorAccount: {
+    type: String
+  },
+  operatedAccount: {
+    type: String
+  },
+  roleBefore: {
+    type: String
+  },
+  roleAfter: {
+    type: String
+  },
+  time: {
+    type: Number
+  }
+})
+userRoleChangeSchema.index({operatorAccount: 1, operatedAccount: 1, time: 1}, {unique: true})
 
-exports.User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema);
+(async function () {
+  const user = await User.find({account: 'admin@qq.com'})
+  if (!user) {
+    await User.create({
+      account: 'admin@qq.com',
+      password: '123456',
+      username: 'Admin',
+      role: '总领导',
+      entryTime: Date.now()
+    })
+  }
+})()
+
+
+exports.User = User
 exports.Product = mongoose.model('Product', productSchema)
 exports.Purchase = mongoose.model('Purchase', purchaseSchema)
 exports.ProductInventoryChange = mongoose.model('ProductInventoryChange', productInventoryChangeSchema)
 exports.Sales = mongoose.model('Sales', salesSchema)
 exports.Chat = mongoose.model('Chat', chatSchema)
+exports.UserRoleChange = mongoose.model('UserRoleChange', userRoleChangeSchema)
