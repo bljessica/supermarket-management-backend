@@ -11,6 +11,7 @@ const salesRouter = require('./routes/sales')
 const userRouter = require('./routes/user')
 const chatRouter = require('./routes/chat')
 const userRoleChangeRouter = require('./routes/userRoleChange')
+const saveAdminUser = require('./utils/saveAdminUser')
 
 const app = express()
 
@@ -43,5 +44,9 @@ app.use('/', salesRouter)
 app.use('/', userRouter)
 app.use('/', chatRouter)
 app.use('/', userRoleChangeRouter)
+
+saveAdminUser().then(() => {
+  console.log('管理员账号存储成功')
+})
 
 module.exports = app

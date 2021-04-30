@@ -203,22 +203,9 @@ const userRoleChangeSchema = new Schema({
 })
 userRoleChangeSchema.index({operatorAccount: 1, operatedAccount: 1, time: 1}, {unique: true})
 
-const User = mongoose.model('User', userSchema);
-(async function () {
-  const user = await User.find({account: 'admin@qq.com'})
-  if (!user) {
-    await User.create({
-      account: 'admin@qq.com',
-      password: '123456',
-      username: 'Admin',
-      role: '总领导',
-      entryTime: Date.now()
-    })
-  }
-})()
 
 
-exports.User = User
+exports.User = mongoose.model('User', userSchema)
 exports.Product = mongoose.model('Product', productSchema)
 exports.Purchase = mongoose.model('Purchase', purchaseSchema)
 exports.ProductInventoryChange = mongoose.model('ProductInventoryChange', productInventoryChangeSchema)
